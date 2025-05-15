@@ -1,76 +1,86 @@
-# Credit Card Fraud Detection using Neural Networks
+# 💳 Credit Card Fraud Detection using Neural Networks
 
-This project implements a binary classification model to detect fraudulent credit card transactions using a fully connected neural network. The dataset is highly imbalanced, so techniques like SMOTE and precision-recall evaluation are used to improve performance.
+This project implements multiple neural network models to detect fraudulent credit card transactions. Due to the highly imbalanced nature of the dataset, we focus on careful preprocessing, use of SMOTE for oversampling, and evaluation using precision-recall-based metrics.
 
 ---
 
 ## 📁 Dataset
 
-- **Source**: [Kaggle - Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
-- **Description**: Contains transactions made by European cardholders in September 2013.
-- **Features**:
-  - 30 columns: `V1` to `V28` (PCA-transformed), `Amount`, `Time`, and `Class`
-  - `Class` = 1 for fraud, 0 for normal transactions
+* **Source:** [Kaggle - Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+* **Features:** PCA-transformed features (V1–V28), `Amount`, and `Class` (fraud = 1, normal = 0)
+* **Size:** \~285,000 transactions; \~0.17% are fraud cases
 
 ---
 
 ## ⚙️ Methodology
 
-1. **Data Preprocessing**
-   - Dropped `Time` column
-   - Scaled `Amount` and all features using `StandardScaler`
+### 🔹 Data Preprocessing
 
-2. **Train-Test Split**
-   - Stratified split (80% training, 20% testing)
-   - Ensured no data leakage by applying SMOTE only on training data
+* Dropped `Time` column
+* Scaled `Amount` and all features using `StandardScaler`
 
-3. **Handling Class Imbalance**
-   - Applied **SMOTE** (Synthetic Minority Over-sampling Technique) to generate synthetic fraud samples in the training set
+### 🔹 Train-Test Split
 
-4. **Model Architecture**
-   - A simple Dense Neural Network:
-     - Dense → Dropout → Dense → Dropout → Dense (Sigmoid)
-   - Optimizer: `Adam`
-   - Loss: `Binary Crossentropy`
-
-5. **Evaluation Metrics**
-   - **Confusion Matrix**
-   - **Classification Report**
-   - **Precision-Recall AUC**
-   - **PR Curve Plot**
+* Stratified 80/20 split
+* SMOTE applied **only to the training set** to avoid data leakage
 
 ---
 
-## 📊 Results
+## 🧠 Models Implemented
 
-- Achieved high **Recall** and **PR AUC** (especially important for fraud detection)
-- Adjusted classification threshold from 0.5 to **0.2** to reduce false negatives
+### 1. **Multilayer Perceptron (MLP)**
+
+* Implemented using `sklearn.neural_network.MLPClassifier`
+* Tuned hidden layers: (50, 30) and (30, 50, 20)
+* Best performance achieved with 3 hidden layers
+* High precision and recall after threshold tuning
+
+### 2. **Feedforward Neural Network (FNN)**
+
+* Implemented from scratch using NumPy
+* Two hidden layers with ReLU activation
+* Used manual backpropagation and batch gradient descent
+* Tuned using grid search for learning rate and architecture
+
+### 3. **LSTM (Long Short-Term Memory)**
+
+* Sequential model treating each transaction as a time step
+* One LSTM layer followed by a dense output layer
+* Designed to capture temporal dependencies between patterns
+* Tuned with different sequence lengths and hidden states
+
+### 4. **Autoencoder with LightGBM**
+
+* Unsupervised Autoencoder trained to reconstruct normal transactions
+* Reconstruction error used as a new feature
+* LightGBM classifier trained on these features for final classification
+* Achieved best PR AUC among all models
 
 ---
 
-## 📦 Requirements
+## 📊 Evaluation Metrics
 
-Install dependencies using:
+* **Precision, Recall, F1-Score**
+* **PR AUC (Precision-Recall Area Under Curve)**
+* **Confusion Matrix**
+* **Precision-Recall Curve Plot**
 
-```bash
-pip install -r requirements.txt
-````
-
-**requirements.txt**
-
-```txt
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
-imblearn
-tensorflow
-```
+**Threshold tuned from 0.5 → 0.2** to reduce false negatives
 
 ---
 
-## 🧠 Model Training
+## ✅ Results
+
+| Model              | PR AUC | Remarks                                |
+| ------------------ | ------ | -------------------------------------- |
+| Autoencoder + LGBM | High   | Best overall performance               |
+| LSTM               | High   | Good sequence-based fraud detection    |
+| MLP                | High   | Tuned well, interpretable architecture |
+| FNN                | Medium | Solid baseline, handcrafted backprop   |
+
+---
+
+## 🚀 Run the Model
 
 ```bash
 python fraud_detection_nn.py
@@ -81,7 +91,9 @@ python fraud_detection_nn.py
 ## 📈 Output
 
 * PR AUC Score
-* Confusion Matrix (Heatmap)
-* Precision-Recall Curve
 * Classification Report
+* Confusion Matrix (heatmap)
+* Precision-Recall Curve
+
+---
 
